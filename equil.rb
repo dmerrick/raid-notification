@@ -49,7 +49,7 @@ end
 # external server.
 # authtype is the authentication type, one of :plain, :login, or :cram_md5.
 def sendEmail(address='localhost', port = nil, helo = 'localhost.localdomain',
-             user = nil, password = nil, authtype = nil)
+              user = nil, password = nil, authtype = nil)
   begin # catching errors
     Net::SMTP.start(address,port,helo,user,password,authtype) do |smtp|
       fromAddr = $fromStr.sub(/^.*</,"").sub(/>.*$/,"")
@@ -63,7 +63,7 @@ def sendEmail(address='localhost', port = nil, helo = 'localhost.localdomain',
           f.puts "To: #{toStr}"
           f.puts "Subject: #$lineup"
           f.puts # the body follows
-          f.puts "Time to sign up!"
+          f.puts "Time to sign up!" unless toStr =~ /.*@vtext.com/
         end # open_message_stream
       end # each
     end # start
@@ -85,7 +85,7 @@ completedRuns.tie() do
   open(url) do |file|
     file.each do |line|
       if line =~ /[^\.]topictitle/ && line !~ /[Gg]r(ou)?p #{$ignoreGroup.to_s}/
-        $lineup = line.sub(/^.*topictitle">/,"").sub(/<\/.*$/,"")
+        $lineup = line.sub(/^.*topictitle\">/,"").sub(/<\/.*$/,"")
         $lineup.gsub!(/amp;/,"") # removes the gross &amp;
         puts $lineup
         unless completedRuns.include?($lineup.chomp)
@@ -103,11 +103,3 @@ end # tie
 # Previous raids are kept below this __END__ block. You needn't
 # worry about the filesize, the script prunes itself.
 __END__
-Possible  ZA Run on Friday
-ZA Lineup Friday April 25th 8:00pm Server Time
-Karazhan Line-Up: Wednesday April 30th at 7 pm Server Time
-25 Man Line-Up: Tuesday April 29th at 8pm Server Time
-Zul'Aman Thursday, May 1st 8:00pm Server Time
-Line-Up: Sunday April 27th at 7pm Server Time
-Possible  ZA Run on Friday
-ZA Lineup Friday April 25th 8:00pm Server Time
