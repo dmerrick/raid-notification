@@ -12,9 +12,7 @@ require 'net/smtp'
 # you can use ANY valid email address in $fromStr
 $ignoreGroup = 2
 $fromStr = 'Dana Merrick <dana@equil.us>'
-$toList = ['Dana Merrick <dana.merrick@trincoll.edu>',
-           'Dana Cell <9788950017@vtext.com>',
-           'Morgan T McClure <morgan.mcclure@case.edu>']
+$toList = ['Some User <some.user@example.com>']
 
 
 class Array
@@ -105,10 +103,11 @@ end # tie
 # Previous raids are kept below this __END__ block. You needn't
 # worry about the filesize, the script prunes itself.
 __END__
-25 Man Line-Up: Sunday April 20th at 7pm Server Time
-Group 1 Karazhan Line-Up: Wednesday Apr. 16th at 7pm ST
-Karazhan Line-Up: Wednesday April 23rd at 7 pm Server Time
-Zul'Aman Line-Up: Tuesday April 22 at 7:30 pm Server Time
-25 Man Line-Up: Sunday April 27th at 7pm Server Time
+Possible  ZA Run on Friday
+ZA Lineup Friday April 25th 8:00pm Server Time
+Karazhan Line-Up: Wednesday April 30th at 7 pm Server Time
+25 Man Line-Up: Tuesday April 29th at 8pm Server Time
+Zul'Aman Thursday, May 1st 8:00pm Server Time
+Line-Up: Sunday April 27th at 7pm Server Time
 Possible  ZA Run on Friday
 ZA Lineup Friday April 25th 8:00pm Server Time
