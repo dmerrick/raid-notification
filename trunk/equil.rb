@@ -8,6 +8,8 @@
 require 'open-uri'
 require 'net/smtp'
 
+# &quot;
+
 # these variables are editable
 # you can use ANY valid email address in $fromStr
 $ignoreGroup = 2
@@ -86,7 +88,7 @@ completedRuns.tie() do
     file.each do |line|
       if line =~ /[^\.]topictitle/ && line !~ /[Gg]r(ou)?p #{$ignoreGroup.to_s}/
         $lineup = line.sub(/^.*topictitle\">/,"").sub(/<\/.*$/,"")
-        $lineup.gsub!(/amp;/,"") # removes the gross &amp;
+        $lineup.gsub!(/&amp;/,"&").gsub!(/&quot;/,'"') # remove gross HTML
         puts $lineup
         unless completedRuns.include?($lineup.chomp)
           completedRuns.push($lineup)
