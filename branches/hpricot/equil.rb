@@ -1,107 +1,58 @@
-#!/usr/bin/env ruby -wKU
-# This script goes to the Equilibrium website and looks for new raid postings.
+#!/usr/bin/env ruby 
+# This is my shameful attempt at getting hpricot to take care of
+# the e-raids script for me. It doesn't work at all because I don't
+# really understand what I am doing.
 
-# It will return all current posts for your raid group, and emails you a
-# notification whenever a new raid is posted. To prevent duplicate emails,
-# it stores all raids that it has seen at the end of the file
-
+require 'rubygems'
+require 'hpricot'
 require 'open-uri'
-require 'net/smtp'
 
-# &quot;
+# uses the "old lineups" page for testing
+doc = Hpricot(open("http://www.equil.us/forum/viewforum.php?f=21"))
+# wget the page when you work on it to not pound their server
+#doc = Hpricot(open("eraids.html"))
 
-# these variables are editable
-# you can use ANY valid email address in $fromStr
-$ignoreGroup = 2
-$fromStr = 'Dana Merrick <dana@equil.us>'
-$toList = ['Some User <some.user@example.com>']
+# find all forms with a table and iterate through rows 4,5,6
+(doc/"form/table/tr")[3..5].each do |i|
+	listings = (i/"td/span/a")
+  # okay, now we have a listing saved
 
+  # shameless hack
+	array = []
+	listings.each do |listing|
+		array << listing.inner_html
+	end
 
-class Array
-  # This method reads from the DATA section of this file, which
-  # in Ruby is marked by __END__. It takes each line and pushes
-  # it into the calling array, yields the code block and writes 
-  # the array, one element per line, to the end of the file,
-  # starting at the beginning of the DATA block. Idea stolen
-  # from O'Reilly's Perl Cookbook.
-  def tie()
-    DATA.each_line { |line| self.push(line.chomp) }
-    yield
-    # open the file for writing
-    File.open(__FILE__,File::RDWR) do |file|
-      # look through the file for the DATA section
-      file.each_line do |line|
-        break if line =~ /^__END__$/
-      end
-      # write to the file
-      each { |line| line ? file.puts(line) : file.puts("") }
-    end
-  end
-  
-  # This method shifts the first n elements out of an array.
-  # I'm actually not 100% sure this is working correctly when
-  # it is called at the end of the script.
-  def shiftN!(n)
-    n.times{self.shift}
-  end
+	name,replies,poster,views,date = array
+	puts "name: #{name}"
+	puts "replies: #{replies}"
+	puts "poster: #{poster}"
+	puts "views: #{views}"
+	puts "date: #{date}"
+	puts
+
+  # this doesn't work. run it and compare the values to the site
+  # there seems to be something strange when a lineup has >1 pages
 end
 
-# This method sends an email. For the default values, an MTA (such as
-# postfix) must be running, otherwise you must specify details for an
-# external server.
-# authtype is the authentication type, one of :plain, :login, or :cram_md5.
-def sendEmail(address='localhost', port = nil, helo = 'localhost.localdomain',
-              user = nil, password = nil, authtype = nil)
-  begin # catching errors
-    Net::SMTP.start(address,port,helo,user,password,authtype) do |smtp|
-      fromAddr = $fromStr.sub(/^.*</,"").sub(/>.*$/,"")
-      # SMTP#open_message_stream can take a splat as the second
-      # parameter, but I did it this way to preserve the pretty
-      # 'Person Name <email@addr.ess>' formatting.
-      $toList.each do |toStr|
-        toAddr = toStr.to_s.sub(/^.*</,"").sub(/>.*$/,"")
-        smtp.open_message_stream(fromAddr,toAddr) do |f|
-          f.puts "From: #$fromStr"
-          f.puts "To: #{toStr}"
-          f.puts "Subject: #$lineup"
-          f.puts # the body follows
-          f.puts "Time to sign up!" unless toStr =~ /.*@vtext.com/
-        end # open_message_stream
-      end # each
-    end # start
-  rescue
-    STDERR.print "Mail sending failed: " + $! + "\n"
-    # raise # uncomment this for debugging
-  end # begin
+# all this stuff is saved snippits that I thought might help me
+# really its just a trail of crumbs
+=begin
+(doc/"form/table/tr")[3..5].each do |i|
+	(i/"td/span/a").each_with_index do |j,k|
+	  p "#{k} #{j.inner_html}" #if i =~ /forumline/
+	end
 end
 
-# this is the url it is going to look at
-url = "http://www.equil.us/forum/viewforum.php?f=17"
-# old raids, for testing regexps
-#url = "http://www.equil.us/forum/viewforum.php?f=21"
+(doc/"form/table/tr[3..5]/td/span/a").each_with_index do |k,l|
+	  p "#{l} #{k.inner_html}" #if i =~ /forumline/
+end
 
-# time to start the script!
-# notice that the whole script is inside the tie() &block
-completedRuns = Array.new
-completedRuns.tie() do
-  open(url) do |file|
-    file.each do |line|
-      if line =~ /[^\.]topictitle/ && line !~ /[Gg]r(ou)?p #{$ignoreGroup.to_s}/
-        $lineup = line.sub(/^.*topictitle\">/,"").sub(/<\/.*$/,"")
-        $lineup.gsub!(/&amp;/,"&").gsub!(/&quot;/,'"') # remove gross HTML
-        puts $lineup
-        unless completedRuns.include?($lineup.chomp)
-          completedRuns.push($lineup)
-          sendEmail if defined? $toList && !$toList.empty?
-        end # unless
-      end # if
-    end # each
-  end # open
+(doc/"form/table/").each do |i|
+	p i #if i =~ /forumline/
+end
 
-  # remove the oldest entries if the array is getting big
-  completedRuns.shiftN!(completedRuns.size/2) if completedRuns.size >= 10
-end # tie
-
-# Previous raids are kept below this __END__ block. You needn't
-# worry about the filesize, the script prunes itself.
-__END__
+((doc/"table/")[8]/"tr").each do |f|
+  p f
+end
+=end
