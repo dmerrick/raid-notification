@@ -8,8 +8,6 @@
 require 'open-uri'
 require 'net/smtp'
 
-# &quot;
-
 # these variables are editable
 # you can use ANY valid email address in $fromStr
 $ignoreGroup = 2
